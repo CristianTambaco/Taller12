@@ -6,6 +6,11 @@ import '../models/producto.dart';
 import '../widgets/producto_card.dart';
 import '../widgets/barra_navegacion.dart';
 
+
+
+
+
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -89,32 +94,136 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildContenidoPrincipal() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Encabezado
-          _buildEncabezado(),
-          const SizedBox(height: 20),
-          // Categorías (scroll horizontal)
-          _buildCategorias(),
-          const SizedBox(height: 20),
-          // Título de sección
-          const Text(
-            'Productos Destacados',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+  return LayoutBuilder(
+    builder: (context, constraints) {
+      // Si el ancho es >= 900px, mostrar layout con sidebar
+      if (constraints.maxWidth >= 900) {
+        return Row(
+          children: [
+            // Sidebar con categorías
+            SizedBox(
+              width: 250,
+              child: _buildSidebar(),
             ),
+            const SizedBox(width: 24),
+            // Contenido principal
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Encabezado
+                    _buildEncabezado(),
+                    const SizedBox(height: 20),
+                    // Título de sección
+                    const Text(
+                      'Productos Destacados',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // Grid de productos
+                    _buildGridProductos(),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        );
+      } else {
+        // Layout móvil (actual)
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Encabezado
+              _buildEncabezado(),
+              const SizedBox(height: 20),
+              // Categorías (scroll horizontal)
+              _buildCategorias(),
+              const SizedBox(height: 20),
+              // Título de sección
+              const Text(
+                'Productos Destacados',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              // Grid de productos (RESPONSIVO)
+              _buildGridProductos(),
+            ],
           ),
-          const SizedBox(height: 16),
-          // Grid de productos (RESPONSIVO)
-          _buildGridProductos(),
-        ],
-      ),
-    );
+        );
+      }
+    },
+  );
+}
+
+// Nuevo método para el sidebar
+Widget _buildSidebar() {
+  final categorias = ['Todos', 'Electrónica', 'Fotografía', 'Accesorios'];
+  
+  return Container(
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.grey.withOpacity(0.1),
+          blurRadius: 10,
+          offset: const Offset(0, 2),
+        ),
+      ],
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Categorías',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey,
+          ),
+        ),
+        const SizedBox(height: 16),
+        ...categorias.map((categoria) {
+          return ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: Icon(
+              _getIconoCategoria(categoria),
+              color: Colors.blue,
+            ),
+            title: Text(categoria),
+            onTap: () {},
+            hoverColor: Colors.blue[50],
+          );
+        }).toList(),
+      ],
+    ),
+  );
+}
+
+// Método auxiliar para obtener iconos de categorías
+IconData _getIconoCategoria(String categoria) {
+  switch (categoria) {
+    case 'Electrónica':
+      return Icons.electrical_services; // ✅ Corregido
+    case 'Fotografía':
+      return Icons.camera_alt;
+    case 'Accesorios':
+      return Icons.devices;
+    default:
+      return Icons.category;
   }
+}
+
 
   Widget _buildEncabezado() {
     // LAYOUTBUILDER: Construye UI según el espacio disponible
